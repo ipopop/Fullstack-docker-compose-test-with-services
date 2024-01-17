@@ -1,4 +1,10 @@
-# TODO
+# Using Docker Compose with services
+
+## Client configuration
+
+> inspired by a [Dyma.fr](https://dyma.fr/) "[Docker](https://www.docker.com/products/docker-desktop/)" exercice
+
+---
 
 ```bash
 # Create directories and files
@@ -48,11 +54,13 @@ cd ..;
 echo -e "version: '3.9'\nservices:\n client:\n  stdin_open: true\n  tty: true\n  ports:\n    - '3000:3000'\n  build:\n    dockerfile: Dockerfile.dev\n    context: ./client\n  volumes:\n    - type: bind\n      source: ./client\n      target: /home/node\n    - type: volume\n      target: /home/node/node_modules" > docker-compose.dev.yml;
 ```
 
-Download and install Docker Desktop
+---
 
-- Visit [Docker website](https://www.docker.com/products/docker-desktop/), & download "Docker.dmg",
+#### Download and install Docker Desktop
 
-- install it in the "/Applications" directory. 
+- Visit [Docker website](https://www.docker.com/products/docker-desktop/), & download "**Docker.dmg**",
+
+- install it in the "/Applications" directory.
 
 - then, start Docker.
 
@@ -82,15 +90,22 @@ reload;
 docker-compose version; #Docker Compose version 2.24.0
 ```
 
+---
+
+#### Start the services defined in the "**docker-compose.dev.yml**" file and open the React page in browser
+
 ```bash
-# Start the services defined in the docker-compose.dev.yml file and open the React page in browser
-docker compose -f docker-compose.dev.yml up --build; #To create a production build, use npm run build. webpack compiled successfully
+docker compose -f docker-compose.dev.yml up --build;
+#../.. webpack compiled successfully
+```
+
+```bash
 open http://localhost:3000/;
 ```
 
 ---
 
-"Git" : initialize, configure & add and commit your changes
+#### "**Git**" : initialize, configure & add and commit your changes
 
 ```bash
 # Initialize a Git repository
@@ -112,3 +127,67 @@ git add .;
 # Commit the changes with a message
 git commit -m "Initial commit";
 ```
+
+```bash
+# initialize your github distant repository
+git branch -M main;
+git remote add origin git@github.com:yourgithubrepo/Fullstack-docker-compose-test-with-services.git;
+git push -u origin main;
+```
+
+---
+
+#### Modify the application source code
+
+For testing the API, modify the source code of React app.
+
+Replace the content of "**client/src/App.js**" file with the following code:
+
+```js
+import logo from './logo.svg';
+import './App.css';
+import { useEffect, useState } from 'react';
+
+function App() {
+  const [count, setCount] = useState();
+  useEffect(() => {
+    async function fetchCount() {
+      try {
+        const response = await fetch('/api/count');
+        if (response.ok) {
+          setCount(await response.json());
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchCount();
+  }, []);
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <p>Count: { count }</p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
+  );
+}
+
+export default App;
+```
+
+---
+
+#### next step to do : configure the "**reverse-proxy**"
